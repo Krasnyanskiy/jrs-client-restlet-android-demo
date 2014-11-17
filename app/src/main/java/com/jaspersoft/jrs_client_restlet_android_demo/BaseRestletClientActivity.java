@@ -6,34 +6,37 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.jaspersoft.jrs_client_restlet_android_demo.common.EntityConverter;
+import com.jaspersoft.jrs_client_restlet_android_demo.dto.ClientRoleCollection;
 import com.jaspersoft.jrs_client_restlet_android_demo.service.RetrieveResourceTaskService;
 
-import java.util.concurrent.ExecutionException;
 
+public class BaseRestletClientActivity extends Activity {
 
-public class BaseRestletActivity extends Activity {
+    private static String URL = "http://172.28.146.32:8080/jasperserver-pro/rest_v2/roles?user=superuser";
 
-
-    private static RetrieveResourceTaskService taskService;
-    private static String URL =
-            "http://172.28.146.32:8080/jasperserver-pro" +
-                    "/rest_v2" +
-                    "/resources" +
-                    "/public/Samples/Domains/supermartDomain";
-    private String retrievedEntity;
+    private RetrieveResourceTaskService taskService;
+    private ClientRoleCollection clientRoles;
+    private EntityConverter converter = new EntityConverter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_restlet);
 
-        RetrieveResourceTaskService taskService = new RetrieveResourceTaskService();
+        if (taskService == null) {
+            taskService = new RetrieveResourceTaskService();
+        }
+
         try {
-            retrievedEntity = taskService.execute(URL).get();
-        } catch (ExecutionException | InterruptedException ignored) {}
+            String entityAsString = taskService.execute(URL).get();
+            clientRoles = converter.convert(entityAsString, ClientRoleCollection.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         TextView txtView = new TextView(this);
-        txtView.setText(retrievedEntity);
+        txtView.setText(clientRoles.toString());
         setContentView(txtView);
     }
 
