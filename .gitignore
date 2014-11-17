@@ -6,3 +6,6 @@
 /build
 
 .idea
+jrs-client-restlet-android-demo.iml
+gradlew.bat
+gradle.properties
